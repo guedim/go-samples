@@ -17,4 +17,6 @@ func main() {
 	cardsFromFile := readFromFile(fileName)
 	cardsFromFile.print()
 
+	cards.suffle()
+	cards.print()
 }
