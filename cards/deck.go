@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"strings"
 )
 
@@ -12,7 +13,7 @@ type deck []string
 func newDeck() deck {
 	cards := deck{}
 
-	cardsSuits := []string{"Spades", "Diamonds", "Hearts", "C"}
+	cardsSuits := []string{"Spades", "Diamonds", "Hearts", "Clubs"}
 	cardValues := []string{"Ace", "Two", "Three", "Four"}
 
 	for _, suit := range cardsSuits {
@@ -36,4 +37,8 @@ func deal(d deck, handSize int) (deck, deck) {
 
 func (d deck) toString() string {
 	return strings.Join([]string(d), ",")
+}
+
+func (d deck) saveToFile(fileName string) error {
+	return ioutil.WriteFile(fileName, []byte(d.toString()), 0666)
 }
