@@ -1,20 +1,20 @@
 package main
 
-import "fmt"
+var fileName string
 
 func main() {
-	cards := newDeck()
 
-	cards.print()
+	fileName = "my_cards.txt"
+
+	cards := newDeck()
 	hand, remainingDeck := deal(cards, 5)
 
 	hand.print()
 	remainingDeck.print()
 
-	fmt.Println("-------")
+	cards.saveToFile(fileName)
 
-	fmt.Println(cards.toString())
-
-	cards.saveToFile("my_cards.txt")
+	cardsFromFile := readFromFile(fileName)
+	cardsFromFile.print()
 
 }
