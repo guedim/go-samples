@@ -19,7 +19,7 @@ func main() {
 		lastName:  "Guerrero",
 		contact:   contactInfo{"matias@gmail.com", 111111},
 	}
-	fmt.Println(matias)
+	matias.print()
 
 	yuly := person{
 		firstName: "Yuly",
@@ -28,7 +28,7 @@ func main() {
 			email:   "yulyfuentes1@gmail.com",
 			zipCode: 111111,
 		}}
-	fmt.Println(yuly)
+	yuly.print()
 
 	var mario person
 
@@ -36,6 +36,17 @@ func main() {
 	mario.lastName = "Guerrero"
 	mario.contact.email = "guedim@gmail.com"
 	mario.contact.zipCode = 111111
-	fmt.Printf("%+v", mario)
 
+	marioPointer := &mario
+	marioPointer.updateName("Fernando")
+	mario.print()
+
+}
+
+func (p person) print() {
+	fmt.Printf("%+v\n", p)
+}
+
+func (pointerToPerson *person) updateName(newFirtname string) {
+	(*pointerToPerson).firstName = newFirtname
 }
