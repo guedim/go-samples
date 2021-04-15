@@ -37,8 +37,7 @@ func main() {
 	mario.contact.email = "guedim@gmail.com"
 	mario.contact.zipCode = 111111
 
-	marioPointer := &mario
-	marioPointer.updateName("Fernando")
+	mario.updateName("Fernando")
 	mario.print()
 
 }
