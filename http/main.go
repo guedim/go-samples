@@ -15,6 +15,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	bs := make([]byte, 999999)
+	resp.Body.Read(bs)
+	fmt.Println(string(bs))
+
 	//We Read the response body on the line below.
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
