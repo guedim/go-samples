@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,6 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	//Make a byte slide and full it with all information
 	bs := make([]byte, 999999)
 	resp.Body.Read(bs)
 	fmt.Println(string(bs))
@@ -24,7 +26,8 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	//Convert the body to type string
-	sb := string(body)
-	fmt.Println(sb)
+	fmt.Println(string(body))
+
+	// Using io copy
+	io.Copy(os.Stdout, resp.Body)
 }
