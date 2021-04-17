@@ -6,7 +6,7 @@ type englishBot struct{}
 type spanishBot struct{}
 
 type bot interface {
-	git() string
+	getGreeting() string
 }
 
 func main() {
