@@ -12,10 +12,11 @@ func main() {
 		"http://stackoverflow.com",
 		"http://golan.org",
 		"http://amazon.com",
+		"http://eltiempo.com",
 	}
 
 	for _, link := range links {
-		checkLink(link)
+		go checkLink(link)
 
 	}
 }
