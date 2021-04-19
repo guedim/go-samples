@@ -2,7 +2,7 @@
 
 Go samples for udemy courses
 
-## Udemy. GO: The complete developers Guide.
+## GO: The complete developers Guide - (cdg).
 - channels
 - evenOdd
 - hardModeInterfaces
@@ -12,5 +12,5 @@ Go samples for udemy courses
 - maps
 - structs
 
-## Udemy. Concurrenchy in GO.
+## Concurrenchy in GO - (cg).
 - goroutines
