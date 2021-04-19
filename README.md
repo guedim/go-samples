@@ -1,7 +1,16 @@
-# go-samples
-Go samples
+# golang - samples
 
-First 8 Excersises related to:  
-- Udemy.   GO - The complete developers Guide.
+Go samples for udemy courses
 
+## Udemy. GO: The complete developers Guide.
+- channels
+- evenOdd
+- hardModeInterfaces
+- helloWorld
+- http
+- interfaces
+- maps
+- structs
 
+## Udemy. Concurrenchy in GO.
+- goroutines
