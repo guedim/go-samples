@@ -1,16 +1,16 @@
 package main
 
 import (
-	"atomic"
 	"fmt"
 	"runtime"
 	"sync"
+	"sync/atomic"
 )
 
 func main() {
 	runtime.GOMAXPROCS(4)
 
-	var counter uint64
+	var counter int64
 	var wg sync.WaitGroup
 
 	// implement concurrency safe counter
@@ -19,7 +19,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for c := 0; c < 1000; c++ {
-				atomic.Adduint64(&counter, 1)
+				atomic.AddInt64(&counter, 1)
 			}
 		}()
 	}
