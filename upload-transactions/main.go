@@ -2,59 +2,100 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 	"os"
+	"strings"
+	"time"
 )
 
 /*
 Script to unload a transaction to payment workflow  Gigaspaces
 
-File sample 1
+File sample
 transactionId;orderId
 1d344150-bfa5-4690-8e49-213cfe751cb4;1150486395
 6fbca7ca-c082-4fbc-8b31-307579c6cb42;392652473
-
-File sample 2
-orderId;transactionId
-1150486395;1d344150-bfa5-4690-8e49-213cfe751cb4
-392652473;6fbca7ca-c082-4fbc-8b31-307579c6cb42
 */
+
+var FILE_PATH string
+var URL string
+var USER string
+var PASSWORD string
+var HEADERS string
+var SEPARATOR string
 
 func main() {
 
-	// Change this
-	FILE_PATH := "/Users/mario.guerrero/Downloads/fix_txs.csv"
-	//URL := "activemq-houston.payulatam.com:8161/api/message?destination=queue://pps.acknowledge.notification"
+	FILE_PATH = "fix_txs.csv"
+	URL = "activemq-houston.payulatam.com:8161/api/message?destination=queue://pps.acknowledge.notification"
+	USER = "admin"
+	PASSWORD = "4QZboDsXmjMd7"
+	HEADERS = "{'content-type': 'application/json'}"
+	SEPARATOR = ";"
 
-	//ORDER_ID_NAME := "orderId"             //Case insensitive
-	//TRANSACTION_ID_NAME := "transactionId" //Case insensitive
-	//USER := "admin"
-	//PASSWORD := "4QZboDsXmjMd7"
-	//HEADERS := "{'content-type': 'application/json'}"
-
-	openFile(FILE_PATH)
-
+	processFile()
 }
 
-func openFile(filePath string) {
+func processFile() {
 	fmt.Println("starting...")
 
-	file, err := os.Open("sample.txt")
+	file, err := os.Open(FILE_PATH)
 	check(err)
 
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
-	var text []string
+	var textFile []string
 
 	for scanner.Scan() {
-		text = append(text, scanner.Text())
+		textFile = append(textFile, scanner.Text())
 	}
-
 	file.Close()
 
-	for _, each_ln := range text {
-		fmt.Println(each_ln)
+	headerLine := textFile[0]
+	fmt.Println("Sending ", len(textFile), " records...")
+	println(headerLine)
+
+	positionTransactionId := 0
+	positionOrderId := 1
+	startTime := time.Now()
+
+	textFile = textFile[1:]
+	for _, fileLine := range textFile {
+		splitLine := strings.Split(fileLine, SEPARATOR)
+		doPost(splitLine[positionTransactionId], splitLine[positionOrderId])
 	}
+
+	finalTime := time.Since(startTime)
+	fmt.Println("\nThe process has finished")
+	fmt.Printf("Time: %.2f seconds", float64(finalTime)/float64(time.Second))
+
+}
+
+func doPost(transactionId string, orderId string) {
+
+	message := map[string]interface{}{
+		"transactionId": transactionId,
+		"orderId":       orderId,
+	}
+
+	bytesmessage, err := json.Marshal(message)
+	check(err)
+
+	fmt.Print("Sending: ", string(bytesmessage))
+
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	resp, err := http.Post("https://"+USER+":"+PASSWORD+"@"+URL, HEADERS, bytes.NewBuffer(bytesmessage))
+	if err != nil {
+		log.Fatal("Error sending orderId: "+string(orderId), err)
+		check(err)
+	}
+	fmt.Println(" got http status code: ", resp.StatusCode)
+
 }
 
 func check(e error) {
