@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -28,6 +29,7 @@ var USER string
 var PASSWORD string
 var HEADERS string
 var SEPARATOR string
+var WORKERS_NUMBER int
 
 func main() {
 
@@ -37,11 +39,52 @@ func main() {
 	PASSWORD = "4QZboDsXmjMd7"
 	HEADERS = "{'content-type': 'application/json'}"
 	SEPARATOR = ";"
+	WORKERS_NUMBER = 3
 
-	processFile()
+	textFile := readFile()
+
+	headerLine := textFile[0]
+	fmt.Println("Sending ", len(textFile), " records...")
+	println(headerLine)
+
+	startTime := time.Now()
+
+	processFile(textFile)
+
+	finalTime := time.Since(startTime)
+	fmt.Println("\nThe process has finished")
+	fmt.Printf("Time: %.2f seconds", float64(finalTime)/float64(time.Second))
 }
 
-func processFile() {
+func processFile(textFile []string) {
+
+	jobs := make(chan map[string]string, 100)
+	results := make(chan string, 100)
+
+	// Define only WORKERS_NUMBER
+	for i := 0; i < WORKERS_NUMBER; i++ {
+		go doPost(jobs, results)
+	}
+
+	textFile = textFile[1:]
+	for _, fileLine := range textFile {
+		splitLine := strings.Split(fileLine, SEPARATOR)
+		message := map[string]string{
+			"transactionId": splitLine[0],
+			"orderId":       splitLine[1],
+		}
+		jobs <- message
+	}
+	close(jobs)
+
+	// collect all the results of the work.
+	for a := 1; a <= len(textFile); a++ {
+		fmt.Println(<-results)
+	}
+
+}
+
+func readFile() []string {
 	fmt.Println("starting...")
 
 	file, err := os.Open(FILE_PATH)
@@ -55,47 +98,24 @@ func processFile() {
 		textFile = append(textFile, scanner.Text())
 	}
 	file.Close()
-
-	headerLine := textFile[0]
-	fmt.Println("Sending ", len(textFile), " records...")
-	println(headerLine)
-
-	positionTransactionId := 0
-	positionOrderId := 1
-	startTime := time.Now()
-
-	textFile = textFile[1:]
-	for _, fileLine := range textFile {
-		splitLine := strings.Split(fileLine, SEPARATOR)
-		doPost(splitLine[positionTransactionId], splitLine[positionOrderId])
-	}
-
-	finalTime := time.Since(startTime)
-	fmt.Println("\nThe process has finished")
-	fmt.Printf("Time: %.2f seconds", float64(finalTime)/float64(time.Second))
-
+	return textFile
 }
 
-func doPost(transactionId string, orderId string) {
+func doPost(jobs <-chan map[string]string, results chan<- string) {
 
-	message := map[string]interface{}{
-		"transactionId": transactionId,
-		"orderId":       orderId,
-	}
+	for j := range jobs {
 
-	bytesmessage, err := json.Marshal(message)
-	check(err)
-
-	fmt.Print("Sending: ", string(bytesmessage))
-
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-	resp, err := http.Post("https://"+USER+":"+PASSWORD+"@"+URL, HEADERS, bytes.NewBuffer(bytesmessage))
-	if err != nil {
-		log.Fatal("Error sending orderId: "+string(orderId), err)
+		bytesmessage, err := json.Marshal(j)
 		check(err)
-	}
-	fmt.Println(" got http status code: ", resp.StatusCode)
 
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		resp, err := http.Post("https://"+USER+":"+PASSWORD+"@"+URL, HEADERS, bytes.NewBuffer(bytesmessage))
+		if err != nil {
+			log.Fatal("Error sending message: "+string(bytesmessage), err)
+			check(err)
+		}
+		results <- "Sending:" + string(bytesmessage) + " got http status code: " + strconv.Itoa(resp.StatusCode)
+	}
 }
 
 func check(e error) {
