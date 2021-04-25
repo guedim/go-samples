@@ -24,30 +24,28 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.5.0.Final</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
-                <groupId>com.github.os72</groupId>
-                <artifactId>protoc-jar-maven-plugin</artifactId>
-                <version>3.11.4</version>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.5.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:3.5.1-1:exe:${os.detected.classifier}</protocArtifact>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>protoc.main</id>
-                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
                         </goals>
-                        <configuration>
-                            <protocVersion>3.13.0</protocVersion>
-                            <addSources>main</addSources>
-                            <includeMavenTypes>direct</includeMavenTypes>
-                            <includeStdTypes>true</includeStdTypes>
-                            <includeDirectories>
-                                <include>src/main/proto</include>
-                            </includeDirectories>
-                            <inputDirectories>
-                                <include>src/main/proto</include>
-                            </inputDirectories>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
