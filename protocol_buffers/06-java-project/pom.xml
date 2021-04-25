@@ -38,7 +38,7 @@
                         </goals>
                         <configuration>
                             <protocVersion>3.13.0</protocVersion>
-                            <addSources>main</addSources>
+                            <addSources>all</addSources>
                             <includeMavenTypes>direct</includeMavenTypes>
                             <includeStdTypes>true</includeStdTypes>
                             <includeDirectories>
