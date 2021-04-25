@@ -1,19 +1,13 @@
 package com.guedim.protocol.buf;
 
-import example.simple.Simple.SimpleMessage;
 
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import example.simple.Simple;
 
 public class Program {
     public static void main(String[] args)  {
 
-System.out.println("Hola Mundo");
-
-        SimpleMessage.Builder builder = SimpleMessage.newBuilder();
+        System.out.println("Hola Mundo");
+        Simple.SimpleMessage.Builder builder = SimpleMessage.newBuilder();
         builder.setId(42)
                 .setIsSimple(true)
                 .setName("My simple message name")
