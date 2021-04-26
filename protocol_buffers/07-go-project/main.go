@@ -68,6 +68,6 @@ func doSimple() *simple.SimpleMessage {
 		SampleList: []int32{1, 2, 3, 4, 5},
 	}
 
-	fmt.Println(sm)
+	fmt.Println(&sm)
 	return &sm
 }
