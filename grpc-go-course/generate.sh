@@ -12,4 +12,11 @@ go mod init grpc-greeting
 go mod tidy 
 
 
+# run server
+go run greet/greet_server/server.go
+
+# fun client
+go run greet/greet_client/client.go
+
+
 
