@@ -51,21 +51,21 @@ func (*server) PrimeNumberDescomposition(req *calcpb.PrimeRequest, stream calcpb
 
 func (*server) ComputeAverage(stream calcpb.SumService_ComputeAverageServer) error {
 	fmt.Printf("ComputeAverage function was invoked with a streaming request\n")
-	sum := 0
+	sum := int32(0)
 	count := 0
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
 			// we have finished reading the client stream
+			average := float64(sum) / float64(count)
 			return stream.SendAndClose(&calcpb.ComputedResponse{
-				Result: float32(sum / count),
+				Average: average,
 			})
 		}
 		if err != nil {
 			log.Fatalf("Error while reading client stream: %v", err)
 		}
-		number := req.GetNumber()
-		sum += int(number)
+		sum += req.GetNumber()
 		count++
 	}
 }
