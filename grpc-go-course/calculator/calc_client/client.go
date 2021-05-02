@@ -6,6 +6,7 @@ import (
 	"grpc-greeting/calculator/calcpb"
 	"io"
 	"log"
+	"time"
 
 	"google.golang.org/grpc"
 )
@@ -23,8 +24,8 @@ func main() {
 	client := calcpb.NewSumServiceClient(conn)
 
 	//doUnary(client)
-
-	doServerStreaming(client)
+	//doServerStreaming(client)
+	doClientStreaming(client)
 
 }
 
@@ -67,4 +68,40 @@ func doServerStreaming(c calcpb.SumServiceClient) {
 		}
 		log.Printf("Response from GreetManyTimes: %v", msg.GetResult())
 	}
+}
+
+func doClientStreaming(c calcpb.SumServiceClient) {
+	fmt.Println("Starting to do a compute average client streaming RPC...")
+
+	requests := []*calcpb.NumberRequest{
+		{
+			Number: 1,
+		},
+		{
+			Number: 2,
+		},
+		{
+			Number: 3,
+		},
+		{
+			Number: 4,
+		},
+	}
+
+	stream, err := c.ComputeAverage(context.Background())
+	if err != nil {
+		log.Fatalf("Error while calling ComputeAverage: %v", err)
+	}
+	// we iterate over slice requests and send each message individually
+	for _, req := range requests {
+		fmt.Printf("Sending request: %v\n", req)
+		stream.Send(req)
+		time.Sleep(1 * time.Second)
+	}
+
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Error while receiving response form ComputeAverage: %v", err)
+	}
+	fmt.Printf("ComputeAverage response: %v\n", res.GetAverage())
 }
