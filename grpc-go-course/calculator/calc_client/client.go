@@ -71,7 +71,7 @@ func doServerStreaming(c calcpb.SumServiceClient) {
 }
 
 func doClientStreaming(c calcpb.SumServiceClient) {
-	fmt.Println("Starting to do an client streaming RPC...")
+	fmt.Println("Starting to do a compute average client streaming RPC...")
 
 	requests := []*calcpb.NumberRequest{
 		{
@@ -103,5 +103,5 @@ func doClientStreaming(c calcpb.SumServiceClient) {
 	if err != nil {
 		log.Fatalf("Error while receiving response form ComputeAverage: %v", err)
 	}
-	fmt.Printf("ComputeAverage response: %v\n", res)
+	fmt.Printf("ComputeAverage response: %v\n", res.GetAverage())
 }
