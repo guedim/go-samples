@@ -40,6 +40,14 @@ message FindMaximumResponse {
     int32 maximum = 1;
 }
 
+message SquareRootRequest {
+    int32 number = 1;
+}
+
+message SquareRootResponse {
+    double number_root = 1;
+}
+
 service SumService {
     // unary api
     rpc Add (SumRequest) returns (SumResponse) {};
@@ -52,4 +60,9 @@ service SumService {
 
     // BiDi Streming
     rpc FindMaximum(stream FindMaximumRequest) returns (stream FindMaximumResponse) {}; 
+
+    // Error handling
+    // This method will throw an exception if sent a negative number
+    // The error being sent is of type INVALID_ARGUMENT
+    rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
 }
