@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	"grpc-greeting/calculator/calcpb"
+
+	"google.golang.org/grpc/reflection"
 )
 
 type server struct {
@@ -125,6 +127,9 @@ func main() {
 
 	s := grpc.NewServer()
 	calcpb.RegisterSumServiceServer(s, &server{})
+
+	// Registrer reflection on gRPC server
+	reflection.Register(s)
 
 	if err := s.Serve(list); err != nil {
 		log.Fatalf("Failed to server: %v", err)
