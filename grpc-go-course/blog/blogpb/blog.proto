@@ -8,9 +8,17 @@ message Blog {
     string id = 1;
     string author_id = 2;
     string title = 3;
-    string contect = 4;
+    string content = 4;
+}
+
+message CreateBlogRequest {
+    Blog blog = 1;
+}
+
+message CreateBlogResponse {
+    Blog blog = 1; // will have a blog_id
 }
 
 service BlogService {
-    
+    rpc CreateBlog (CreateBlogRequest) returns (CreateBlogResponse);
 }
