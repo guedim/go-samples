@@ -24,20 +24,21 @@ var collection *mongo.Collection
 type server struct{}
 
 type blogItem struct {
-	ID       primitive.ObjectID `bson:"_id,omitemty"`
+	ID       primitive.ObjectID `bson:"_id,omitempty"`
 	AuthorID string             `bson:"author_id"`
 	Content  string             `bson:"content"`
 	Title    string             `bson:"title"`
 }
 
 func (*server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) (*blogpb.CreateBlogResponse, error) {
+	fmt.Println("Created blog request !!!")
 	blog := req.GetBlog()
 	data := blogItem{
 		AuthorID: blog.GetAuthorId(),
 		Content:  blog.GetContent(),
 		Title:    blog.GetTitle(),
 	}
-	res, err := collection.InsertOne(context.Background(), data)
+	res, err := collection.InsertOne(ctx, data)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Internal error: %v", err))
 	}
