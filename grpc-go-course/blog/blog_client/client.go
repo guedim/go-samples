@@ -48,6 +48,20 @@ func main() {
 	if err3 != nil {
 		fmt.Printf("Error finding a blog by id: %v\n", err3)
 	}
-	fmt.Printf("Blog read with id: %v", readBlogRes)
+	fmt.Printf("Blog read with id: %v \n", readBlogRes)
+
+	// update blog
+	fmt.Println("updating  the blog")
+	newBlog := &blogpb.Blog{
+		Id:       blogId,
+		AuthorId: "Matías (edited)",
+		Title:    "Matines blog (edited)",
+		Content:  "Matines day to day blog (edited)",
+	}
+	updateRes, err4 := client.UpdateBlog(context.Background(), &blogpb.UpdateBlogRequest{Blog: newBlog})
+	if err4 != nil {
+		fmt.Printf("Error updating  a blog by id: %v\n", err4)
+	}
+	fmt.Printf("Blog was updated : %v \n", updateRes)
 
 }
