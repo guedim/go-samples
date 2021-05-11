@@ -37,7 +37,7 @@ func main() {
 	fmt.Printf("Blog has been created: %v\n", createBlogRes)
 	blogId := createBlogRes.GetBlog().GetId()
 
-	// Create blog
+	// Reading a blog
 	fmt.Println("Reading a blog by id")
 	_, err2 := client.ReadBlog(context.Background(), &blogpb.ReadBlogRequest{BlogId: "609a03c4a3d154328913d451"})
 	if err2 != nil {
@@ -63,5 +63,17 @@ func main() {
 		fmt.Printf("Error updating  a blog by id: %v\n", err4)
 	}
 	fmt.Printf("Blog was updated : %v \n", updateRes)
+
+	// Delete blog
+	fmt.Println("deleting the blog")
+	_, err5 := client.DeleteBlog(context.Background(), &blogpb.DeleteBlogRequest{BlogId: "609a03c4a3d154328913d451"})
+	if err5 != nil {
+		fmt.Printf("Error deleting a blog by id: %v\n", err5)
+	}
+	deleteBlogRes, err6 := client.DeleteBlog(context.Background(), &blogpb.DeleteBlogRequest{BlogId: readBlogReq.GetBlogId()})
+	if err6 != nil {
+		fmt.Printf("Error deleting a blog by id: %v\n", err6)
+	}
+	fmt.Printf("Blog deleted with id: %v \n", deleteBlogRes.GetBlogId())
 
 }
