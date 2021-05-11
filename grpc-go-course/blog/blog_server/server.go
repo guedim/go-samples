@@ -31,6 +31,15 @@ type blogItem struct {
 	Title    string             `bson:"title"`
 }
 
+func dataToBlogpb(data blogItem) *blogpb.Blog {
+	return &blogpb.Blog{
+		Id:       data.ID.Hex(),
+		AuthorId: data.AuthorID,
+		Content:  data.Content,
+		Title:    data.Title,
+	}
+}
+
 func (*server) CreateBlog(ctx context.Context, req *blogpb.CreateBlogRequest) (*blogpb.CreateBlogResponse, error) {
 	fmt.Println("Created blog request !!!")
 	blog := req.GetBlog()
@@ -74,12 +83,36 @@ func (*server) ReadBlog(ctx context.Context, req *blogpb.ReadBlogRequest) (*blog
 	if err := res.Decode(data); err != nil {
 		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("Cannot find blog with specified id: %v", err))
 	}
-	return &blogpb.ReadBlogResponse{Blog: &blogpb.Blog{
-		Id:       data.ID.Hex(),
-		AuthorId: data.AuthorID,
-		Content:  data.Content,
-		Title:    data.Title,
-	}}, nil
+	return &blogpb.ReadBlogResponse{Blog: dataToBlogpb(*data)}, nil
+}
+
+func (*server) UpdateBlog(ctx context.Context, req *blogpb.UpdateBlogRequest) (*blogpb.UpdateBlogResponse, error) {
+	fmt.Println("Update  blog request !!!")
+	blog := req.GetBlog()
+	oid, err := primitive.ObjectIDFromHex(blog.GetId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("cannot parse Id : %v", err))
+	}
+
+	// create an empty struct
+	data := &blogItem{}
+	filter := bson.D{primitive.E{Key: "_id", Value: oid}}
+	res := collection.FindOne(context.Background(), filter)
+	if err := res.Decode(data); err != nil {
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("Cannot find blog with specified id: %v", err))
+	}
+
+	// we update our internal struct
+	data.AuthorID = blog.GetAuthorId()
+	data.Content = blog.GetContent()
+	data.Title = blog.GetTitle()
+
+	_, err2 := collection.ReplaceOne(ctx, filter, data)
+	if err2 != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Cannot update blog with specified id: %v", err2))
+	}
+
+	return &blogpb.UpdateBlogResponse{Blog: dataToBlogpb(*data)}, nil
 }
 
 func main() {
