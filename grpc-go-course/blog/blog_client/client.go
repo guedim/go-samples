@@ -32,7 +32,22 @@ func main() {
 
 	createBlogRes, err := client.CreateBlog(context.Background(), &blogpb.CreateBlogRequest{Blog: blog})
 	if err != nil {
-		log.Fatalf("Unexpected error creating blog:  %v", err)
+		log.Fatalf("Unexpected error creating blog:  %v \n", err)
 	}
-	fmt.Printf("Blog has been created: %v", createBlogRes)
+	fmt.Printf("Blog has been created: %v\n", createBlogRes)
+	blogId := createBlogRes.GetBlog().GetId()
+
+	// Create blog
+	fmt.Println("Reading a blog by id")
+	_, err2 := client.ReadBlog(context.Background(), &blogpb.ReadBlogRequest{BlogId: "609a03c4a3d154328913d451"})
+	if err2 != nil {
+		fmt.Printf("Error finding a blog by id: %v\n", err2)
+	}
+	readBlogReq := &blogpb.ReadBlogRequest{BlogId: blogId}
+	readBlogRes, err3 := client.ReadBlog(context.Background(), readBlogReq)
+	if err3 != nil {
+		fmt.Printf("Error finding a blog by id: %v\n", err3)
+	}
+	fmt.Printf("Blog read with id: %v", readBlogRes)
+
 }

@@ -69,7 +69,7 @@ func (*server) ReadBlog(ctx context.Context, req *blogpb.ReadBlogRequest) (*blog
 
 	// create an empty struct
 	data := &blogItem{}
-	filter := bson.NewDocument(bson.EC.ObjectID("_id", oid))
+	filter := bson.D{primitive.E{Key: "_id", Value: oid}}
 	res := collection.FindOne(context.Background(), filter)
 	if err := res.Decode(data); err != nil {
 		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("Cannot find blog with specified id: %v", err))
