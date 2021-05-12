@@ -136,8 +136,8 @@ func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*
 
 func (*server) ListBlog(req *blogpb.ListBlogRequest, stream blogpb.BlogService_ListBlogServer) error {
 	fmt.Println("List  blog request !!!")
-
-	cur, err := collection.Find(context.Background(), nil)
+	filter := bson.D{{}}
+	cur, err := collection.Find(context.Background(), filter)
 	if err != nil {
 		return status.Errorf(codes.Internal, fmt.Sprintf("Unknow internal error: %v", err))
 	}
@@ -150,16 +150,13 @@ func (*server) ListBlog(req *blogpb.ListBlogRequest, stream blogpb.BlogService_L
 		if err != nil {
 			return status.Errorf(codes.Internal, fmt.Sprintf("Error while decoding data from mongoDb: %v", err))
 		}
-
 		stream.Send(&blogpb.ListBlogResponse{Blog: dataToBlogpb(*data)})
-
 		time.Sleep(1 * time.Second)
 	}
 
 	if cur.Err(); err != nil {
 		return status.Errorf(codes.Internal, fmt.Sprintf("Error while closing cursor  from mongoDb: %v", err))
 	}
-
 	return nil
 }
 
