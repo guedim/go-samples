@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -131,6 +132,35 @@ func (*server) DeleteBlog(ctx context.Context, req *blogpb.DeleteBlogRequest) (*
 	}
 
 	return &blogpb.DeleteBlogResponse{BlogId: blogId}, nil
+}
+
+func (*server) ListBlog(req *blogpb.ListBlogRequest, stream blogpb.BlogService_ListBlogServer) error {
+	fmt.Println("List  blog request !!!")
+
+	cur, err := collection.Find(context.Background(), nil)
+	if err != nil {
+		return status.Errorf(codes.Internal, fmt.Sprintf("Unknow internal error: %v", err))
+	}
+
+	defer cur.Close(context.Background())
+
+	for cur.Next(context.Background()) {
+		data := &blogItem{}
+		err := cur.Decode(data)
+		if err != nil {
+			return status.Errorf(codes.Internal, fmt.Sprintf("Error while decoding data from mongoDb: %v", err))
+		}
+
+		stream.Send(&blogpb.ListBlogResponse{Blog: dataToBlogpb(*data)})
+
+		time.Sleep(1 * time.Second)
+	}
+
+	if cur.Err(); err != nil {
+		return status.Errorf(codes.Internal, fmt.Sprintf("Error while closing cursor  from mongoDb: %v", err))
+	}
+
+	return nil
 }
 
 func main() {
