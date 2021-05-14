@@ -14,3 +14,6 @@ Go samples for udemy courses
 
 ## Concurrenchy in GO - (cg).
 - goroutines
+
+## Upload Transactions
+Sample for read a text file, send http post and user go routines.
